@@ -1,7 +1,5 @@
 package net.xdclass.rbac_shiro.config;
 
-import net.xdclass.rbac_shiro.domain.Permission;
-import net.xdclass.rbac_shiro.domain.Role;
 import net.xdclass.rbac_shiro.domain.User;
 import net.xdclass.rbac_shiro.service.UserService;
 import org.apache.shiro.authc.AuthenticationException;
@@ -11,7 +9,6 @@ import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
-import org.apache.shiro.realm.SimpleAccountRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 
 import javax.annotation.Resource;
