@@ -46,7 +46,7 @@ public class CustomRealm extends AuthorizingRealm {
                 role -> {
                     strigRoleList.add(role.getName());
                     role.getPermissionList().stream().map(
-                            permission -> strigPermissionList.add(permission.getName()));
+                            permission -> strigPermissionList.add(permission.getName())).collect(Collectors.toList());
                     return role;
                 }
         ).collect(Collectors.toList());
