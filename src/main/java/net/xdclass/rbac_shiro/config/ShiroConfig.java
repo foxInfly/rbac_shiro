@@ -8,6 +8,7 @@ import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.servlet.Filter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -38,6 +39,12 @@ public class ShiroConfig {
         shiroFilterFactoryBean.setUnauthorizedUrl("/pub/not_permit");
 
 
+        //加载自定义filter
+        Map<String, Filter> filterMap = new LinkedHashMap<>();
+        filterMap.put("roleOrFilter",new CustomRolesOrAuthorizationFilter());
+        shiroFilterFactoryBean.setFilters(filterMap);
+
+
         //拦截路径
         //   坑1:部分路径无法进行拦截，时有时无；是因为使用了HashMap（无需），要使用有序的LinkedHashMap
         Map<String, String> filterChainDefinitionMap = new LinkedHashMap<>();
@@ -49,7 +56,8 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/authc/**", "authc");
 
         //管理员角色才可以访问
-        filterChainDefinitionMap.put("/admin/**", "roles[admin]");
+//        filterChainDefinitionMap.put("/admin/**", "roles[admin]");
+        filterChainDefinitionMap.put("/admin/**", "roleOrFilter[admin,root]");
 
         //有编辑权限才可以访问
         filterChainDefinitionMap.put("/video/update", "perms[video_update]");
