@@ -16,7 +16,7 @@ public class LogoutController {
 
 
 
-    @RequestMapping("/logout")
+  /*  @RequestMapping("/logout")
     public JsonData findMyRecord(){
         Subject subject = SecurityUtils.getSubject();
         if (subject.getPrincipal() != null) {
@@ -25,5 +25,5 @@ public class LogoutController {
         //退出
         SecurityUtils.getSubject().logout();
         return JsonData.buildSucess("logout成功");
-    }
+    }*/
 }

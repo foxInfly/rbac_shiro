@@ -86,7 +86,7 @@ public class ShiroConfig {
         CustomRealm customRealm = new CustomRealm();
 
         //开启加密
-//        customRealm.setCredentialsMatcher(hashedCredentialsMatcher());
+        customRealm.setCredentialsMatcher(hashedCredentialsMatcher());
         return customRealm;
     }
 

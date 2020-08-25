@@ -7,6 +7,7 @@ import net.xdclass.rbac_shiro.service.UserService;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.springframework.web.bind.annotation.*;
 
@@ -58,11 +59,12 @@ public class PublicController {
     @PostMapping("login")
     public JsonData login(@RequestBody UserQuery userQuery, HttpServletRequest request, HttpServletResponse response){
         Subject subject = SecurityUtils.getSubject();
+        Session session = subject.getSession();
         Map<String,Object> info = new HashMap<>();
 
         try {
             UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken(userQuery.getName(), userQuery.getPwd());
-            System.out.println(usernamePasswordToken);
+            System.out.println("usernamePasswordToken: "+usernamePasswordToken);
 
             subject.login(usernamePasswordToken);
 
@@ -72,7 +74,6 @@ public class PublicController {
             return JsonData.buildSucess (info);
         } catch (AuthenticationException e) {
             e.printStackTrace();
-
             return JsonData.buildError ("账号或者密码错误");
         }
     }
