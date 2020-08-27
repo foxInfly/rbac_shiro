@@ -3,6 +3,7 @@ package net.xdclass.rbac_shiro.config;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.session.mgt.SessionManager;
+import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.crazycake.shiro.RedisCacheManager;
@@ -189,5 +190,19 @@ public class ShiroConfig {
         redisSessionDAO.setExpire(30*60);
 
         return redisSessionDAO;
+    }
+
+
+    /**加入注解的使用，不加入这个，shiro的AOP注解不生效(shiro的注解 例如 @RequiresGuest)
+     * @author lipu
+     * @since 2020/8/27 21:44
+     */
+    @Bean
+    public AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor()
+    {
+        AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor = new
+                AuthorizationAttributeSourceAdvisor();
+        authorizationAttributeSourceAdvisor.setSecurityManager(securityManager());
+        return authorizationAttributeSourceAdvisor;
     }
 }

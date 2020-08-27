@@ -26,7 +26,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findAllUserInfoByUsername(String username) {
-        //todo 加缓存
 
         User user = userMapper.findByUsername(username);
         List<Role> roleList = roleMapper.findRoleListByUserId(user.getId());
