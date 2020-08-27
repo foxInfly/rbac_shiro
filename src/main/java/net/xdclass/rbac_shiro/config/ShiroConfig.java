@@ -5,6 +5,9 @@ import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.crazycake.shiro.RedisCacheManager;
+import org.crazycake.shiro.RedisManager;
+import org.crazycake.shiro.RedisSessionDAO;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -41,7 +44,7 @@ public class ShiroConfig {
 
         //加载自定义filter
         Map<String, Filter> filterMap = new LinkedHashMap<>();
-        filterMap.put("roleOrFilter",new CustomRolesOrAuthorizationFilter());
+        filterMap.put("roleOrFilter", new CustomRolesOrAuthorizationFilter());
         shiroFilterFactoryBean.setFilters(filterMap);
 
 
@@ -78,18 +81,26 @@ public class ShiroConfig {
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
         //主要针对前后端分离
         securityManager.setSessionManager(sessionManager());
+
+        //使用自定义的cacheManager
+        securityManager.setCacheManager(cacheManager());
+
+
+
         //设置realm，（推荐放到最后，防止摩尔写方法下不会调用）
         securityManager.setRealm(customRealm());
 
         return securityManager;
     }
 
-    /**自定义realm
+    /**
+     * 自定义realm
+     *
      * @author lipu
      * @since 2020/8/24 21:40
      */
     @Bean
-    public CustomRealm customRealm(){
+    public CustomRealm customRealm() {
         System.out.println("执行ShiroFilterFactoryBean.customRealm()");
         CustomRealm customRealm = new CustomRealm();
 
@@ -98,12 +109,14 @@ public class ShiroConfig {
         return customRealm;
     }
 
-    /**密码器
+    /**
+     * 密码器
+     *
      * @author lipu
      * @since 2020/8/23 23:22
      */
     @Bean
-    public HashedCredentialsMatcher hashedCredentialsMatcher(){
+    public HashedCredentialsMatcher hashedCredentialsMatcher() {
         System.out.println("执行ShiroFilterFactoryBean.hashedCredentialsMatcher()");
         HashedCredentialsMatcher credentialsMatcher = new HashedCredentialsMatcher();
 
@@ -117,18 +130,64 @@ public class ShiroConfig {
     }
 
 
-    /**自定义管理Session
+    /**
+     * 自定义管理Session
+     *
      * @author lipu
      * @since 2020/8/23 23:26
      */
     @Bean
-    public SessionManager sessionManager(){
+    public SessionManager sessionManager() {
         System.out.println("执行ShiroFilterFactoryBean.sessionManager()");
         CustomSessionManager customSessionManager = new CustomSessionManager();
         //设置会话超时时间，默认30分钟，会话过期，单位毫秒
-        customSessionManager.setGlobalSessionTimeout(200*1000);
+//        customSessionManager.setGlobalSessionTimeout(200 * 1000);
+
+        //配置session持久化
+        customSessionManager.setSessionDAO(redisSessionDAO());
 
         return customSessionManager;
     }
 
+
+    /**配置redisManager
+     * @author lipu
+     * @since 2020/8/27 20:44
+     */
+    public RedisManager getRedisManager() {
+        RedisManager redisManager = new RedisManager();
+        redisManager.setHost("192.168.3.55");
+        redisManager.setPort(6379);
+
+        return redisManager;
+    }
+
+    /**配置具体RedisCacheManager实现类
+     * @author lipu
+     * @since 2020/8/27 20:52
+     */
+    public RedisCacheManager cacheManager(){
+        RedisCacheManager redisCacheManager = new RedisCacheManager();
+        redisCacheManager.setRedisManager(getRedisManager());
+
+        //设置过期时间，单位是秒，20
+        redisCacheManager.setExpire(20);
+
+
+        return redisCacheManager;
+    }
+
+    /**自定义session持久化
+     * @author lipu
+     * @since 2020/8/27 21:33
+     */
+    public RedisSessionDAO redisSessionDAO(){
+        RedisSessionDAO redisSessionDAO = new RedisSessionDAO();
+        redisSessionDAO.setRedisManager(getRedisManager());
+
+        //默认30分钟，单位秒
+        redisSessionDAO.setExpire(30*60);
+
+        return redisSessionDAO;
+    }
 }
